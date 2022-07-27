@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="utf-8" />
     <title>vue-lesson</title>
@@ -9,6 +9,16 @@
   <body>
     <div class="sample">
       <h2> {{ message }} </h2>
+      
+
+      <form class="form-inline" action="" v-on:submit.prevent="addTask">
+        <div class="form-group mx-sm-3 mb-3" >
+          <input type="text" class="form-control" v-model="todoItems.text" placeholder="Add new Task">
+        </div>
+          <button v-if="this.todoItems.text !== undefined" v-on:submit.stop.prevent="" class="btn btn-primary mb-3" >Add</button> 
+          <button  v-else="this.todoItems.text == undefined" type="submit" class="btn btn-basic mb-3" v-bind:disabled="this.todoItems.text == undefined">Give task</button>
+      </form>
+
       <ul class="list-group">
         <li class="list-group-item"
             v-for="item in todoItems"><button v-if="item.done == true" class="btn btn-success" >completed</button> <button  v-else="item.done == false" class="btn btn-basic" v-bind:disabled="item.done == false">in order</button> {{ item.text }}</li>
@@ -20,6 +30,7 @@
           el:'.sample',
         data:{
           message: 'Hello from Vue App',
+          text: '',
           todoItems: [
             {id: 1, text: 'task 1', done: false},
             {id: 2, text: 'task 2', done: false},
@@ -27,8 +38,16 @@
             {id: 4, text: 'task 4', done: false},
             {id: 5, text: 'task 5', done: false},
           ]
+        },
+        methods: {
+          addTask(event){
+            let i = 0;
+            this.todoItems.push({id: 'i', text: this.todoItems.text, done: false});
+            i++;
+            this.todoItems.text = ""
+          }
         }
-      })
+      });
       
     </script>
   </body>
