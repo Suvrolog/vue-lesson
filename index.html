@@ -8,35 +8,48 @@
   </head>
   <body>
     <div class="sample">
-      <h2> {{ message }} </h2>
+      <h2 v-show="todoItems.length == 0">Please add new task</h2>
+      <h2 v-show="todoItems != 0"> {{ message }} </h2>
+      
       
 
       <form class="form-inline" action="" v-on:submit.prevent="addTask">
         <div class="form-group mx-sm-3 mb-3" >
           <input type="text" class="form-control" v-model="todoItems.text" placeholder="Add new Task">
+
         </div>
           <button v-if="this.todoItems.text !== undefined" v-on:submit.stop.prevent="" class="btn btn-primary mb-3" >Add</button> 
           <button  v-else="this.todoItems.text == undefined" type="submit" class="btn btn-basic mb-3" v-bind:disabled="this.todoItems.text == undefined">Give task</button>
+        
       </form>
-
+      <form class="form-inline" action="" v-on:submit.prevent="filteredItems">
+        <div>
+          <input placeholder="Search" class="mx-sm-3 mb-3 form-control" type="text" v-model="search" />
+        </div>
+        <button  type="submit" class="btn btn-primary mb-3" >Search</button>
+      </form>
+      <br>
+      <div>
+        <button class="btn btn-primary mb-3" v-on:click="filterAll" >All Task</button> 
+        <button class="btn btn-primary mb-3" v-on:click="filterTrue" >Comleted Task</button> 
+        <button class="btn btn-primary mb-3" v-on:click="filterFalse" >Uncompleted Task</button> 
+      </div>
       <ul class="list-group">
         <li class="list-group-item"
-            v-for="item in todoItems"><button v-if="item.done == true" class="btn btn-success" >completed</button> <button  v-else="item.done == false" class="btn btn-basic" v-bind:disabled="item.done == false">in order</button> {{ item.text }}</li>
+            v-for="item in todoItems"
+            v-for="item.text in filteredItems"><button v-if="item.done == true" class="btn btn-success" v-on:click="item.done = false">completed</button> <button  v-else="item.done == false" v-on:click="item.done = true"class="btn btn-basic" >in order</button> {{ item.text }}</li>
       </ul>
+      
     </div>
-    <script>
-
-      let sample = new Vue ({
+    <script type="application/javascript">
+      let sample = new Vue({
           el:'.sample',
-        data:{
+        data: {
+          search: '',
           message: 'Hello from Vue App',
           text: '',
           todoItems: [
-            {id: 1, text: 'task 1', done: false},
-            {id: 2, text: 'task 2', done: false},
-            {id: 3, text: 'task 3', done: true},
-            {id: 4, text: 'task 4', done: false},
-            {id: 5, text: 'task 5', done: false},
+            
           ]
         },
         methods: {
@@ -45,10 +58,29 @@
             this.todoItems.push({id: 'i', text: this.todoItems.text, done: false});
             i++;
             this.todoItems.text = ""
-          }
-        }
+          },
+
+          filterFalse(){ 
+            let result = this.todoItems.filter((item) => item.done == false);
+            
+            return this.todoItems.push(result);
+          },
+
+          filterTrue(){
+            let result = this.todoItems.filter((item) => item.done == true);
+            
+            return console.log(result);  
+          },
+
+          filterAll(){
+            let result = this.todoItems.filter((item) => item.done.length == false || true);
+            return this.todoItems.push(result);
+          },
+        },
+        computed: {
+          
+        },
       });
-      
     </script>
   </body>
 </html>
