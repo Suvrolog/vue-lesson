@@ -51,18 +51,43 @@
             
       <ul class="list-group">
         <li class="list-group-item" v-for="item in arrayClone" :key="item.id">
-            <div class="mb-3">
-            <button v-bind:class="{ 'btn-success':item.done == true, 'btn-secondary':item.done == false }" v-on:click="item.done = !item.done" class="btn" >{{ item.done ? "Completed" : "In order" }}</button>  
-            <span v-on:click="isActive=!isActive" class="mouse-point"> {{ item.text }} </span> 
-            <button class="btn btn-primary" v-on:click="s">-</button>
+            <div class="mb-1">
+              <button v-bind:class="{ 'btn-success':item.done == true, 'btn-secondary':item.done == false }" v-on:click="item.done = !item.done" class="btn" >{{ item.done ? "Completed" : "In order" }}</button>  
+              <span v-on:click="isActive=!isActive"> {{ item.text }} </span>
+              
+              <span class="myPosition">
+              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Edit
+              </button> 
+              
+              <button class="btn btn-primary" v-on:click="delItem(item)">X</button>
+            </span>
             </div>
-            <form class="input-group" v-show="isActive" action="" v-on:submit.prevent="">
+
+          <form class="input-group" v-show="isActive" action="" v-on:submit.prevent="">
             <div class="input-group" >
-            <input placeholder="Add Task" v-model="item.text" class="form-control" type="text"/>
+            
             <button class="btn btn-primary" v-on:click="isActive=!isActive">Accept</button> 
             </div>
           </form>
 
+          <!-- Modal -->
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Editing</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                 <input placeholder="Add Task" v-model="item.text" class="form-control" type="text"/>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </li>
       </ul>
@@ -83,7 +108,7 @@ export default {
             'btn-primary': true,
             search: '',
             i: 0,
-            message: 'Hello from Vue App',
+            message: 'I suffered for a very long time',
             isActive: false,
             todoItems: [],
             arrayClone: [],
@@ -97,8 +122,11 @@ export default {
           },
 
 
-          delItem(){
-            console.log(this.item.text)
+          delItem(item){
+              var myIndex = this.arrayClone.indexOf(item);
+              if (myIndex !== -1) {
+                  this.arrayClone.splice(myIndex, 1);
+              }
           },
 
           addTask(){
@@ -163,8 +191,11 @@ export default {
 .displaynone{
   display: none;
 }
-.mouse-point{
-  cursor: pointer;
+.myPosition{
+  right: 2%;
+  position: absolute;
+  display: inline-flex;
+  justify-content: space-between;
+  width: 120px;
 }
-
 </style>
