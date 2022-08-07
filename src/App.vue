@@ -125,11 +125,16 @@
 <script>
 import AppProgressBar from "./components/AppProgressBar.vue";
 import AppCounterTask from "./components/AppCounterTask.vue";
+import AppProgressBar from "./components/AppProgressBar.vue";
+//import AppRedact from "./components/AppRedact.vue";
+//import AppFilter from "./components/AppFilter.vue";
 export default {
   name: "App",
   components: {
     "app-progress-bar": AppProgressBar,
     "app-counter-task": AppCounterTask,
+    //"app-redact": AppRedact,
+    //"app-filter": AppFilter,
   },
   data() {
     return {

@@ -1,6 +1,5 @@
 <template>
 <div>
-  <span v-on:click="active = !isActive"> {{ value }} </span>
   <div class="input-group mb-3" v-if="isActive">
     <input
       type="text"

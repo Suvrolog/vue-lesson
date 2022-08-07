@@ -26,7 +26,7 @@
 <script>
 export default {
 
-    props: ['itemDone','todoItems','item.done'],
+    props: ['itemDone','todoItems',],
     methods:{
            
         filterFalse(){
