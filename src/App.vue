@@ -1,7 +1,7 @@
 <template>
   <div class="sample">
-    <h2 v-show="todoItems.length == 0">Please add new task</h2>
-    <h2 v-show="todoItems.length != 0">{{ message }}</h2>
+    <h2 v-show="todoItems.length == 0" v-colored="">Please add new task</h2>
+    <h2 v-show="todoItems.length != 0" v-colored="">{{ message }}</h2>
 
     <form class="input-group mb-3" action="" v-on:submit.prevent="filterAll">
       <div class="input-group mb-3">
@@ -125,7 +125,6 @@
 <script>
 import AppProgressBar from "./components/AppProgressBar.vue";
 import AppCounterTask from "./components/AppCounterTask.vue";
-import AppProgressBar from "./components/AppProgressBar.vue";
 //import AppRedact from "./components/AppRedact.vue";
 //import AppFilter from "./components/AppFilter.vue";
 export default {
