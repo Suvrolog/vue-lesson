@@ -10,6 +10,7 @@
           class="form-control"
           v-model.trim="todoItems.text"
           placeholder="Add new Task"
+          v-focus
         />
         <button v-bind:class="buttonSwitch" v-on:click="addTask" class="btn">
           Add
@@ -83,49 +84,52 @@
     <ul class="list-group">
       <li class="list-group-item" v-for="item in arrayClone" :key="item.id">
         <div class="mb-1">
-          <div  class="mb-3">
-          <button
-            v-bind:class="{
-              'btn-success': item.done == true,
-              'btn-secondary': item.done == false,
-            }"
-            v-on:click="item.done = !item.done"
-            class="btn"
-          >
-            {{ item.done ? "Completed" : "In order" }}
-          </button>
-          <span v-on:click="item.isActive = !item.isActive"> {{ item.text }} </span>
-          <span class="myPosition">
-            <button class="btn btn-primary" v-on:click="delItem(item)">
-              X
+          <div class="mb-3">
+            <button
+              v-bind:class="{
+                'btn-success': item.done == true,
+                'btn-secondary': item.done == false,
+              }"
+              v-on:click="item.done = !item.done"
+              class="btn"
+            >
+              {{ item.done ? "Completed" : "In order" }}
             </button>
-          </span>
+            <span class="mouse" v-on:click="item.isActive = !item.isActive">
+              {{ item.text }}
+            </span>
+            <span class="myPosition">
+              <button class="btn btn-primary" v-on:click="delItem(item)">
+                X
+              </button>
+            </span>
           </div>
-           <div v-bind:class="{ active: item.isActive }" class="input-group mb-1">
+          <div
+            v-bind:class="{ active: item.isActive }"
+            class="input-group mb-1"
+          >
             <input
               type="text"
               class="form-control"
               placeholder="Add new Task"
               v-model="item.text"
             />
-            <button v-on:click="item.isActive = !item.isActive" class="btn btn-primary">
-              X
+            <button
+              v-on:click="item.isActive = !item.isActive"
+              class="btn btn-primary"
+            >
+              Edit
             </button>
           </div>
-        
-          
         </div>
-        
       </li>
     </ul>
   </div>
-  
 </template>
 
 <script>
 import AppProgressBar from "./components/AppProgressBar.vue";
 import AppCounterTask from "./components/AppCounterTask.vue";
-import AppProgressBar from "./components/AppProgressBar.vue";
 //import AppRedact from "./components/AppRedact.vue";
 //import AppFilter from "./components/AppFilter.vue";
 export default {
@@ -145,7 +149,7 @@ export default {
       message: "I suffered for a very long time",
       todoItems: [],
       arrayClone: [],
-      isActive: '',
+      isActive: "",
     };
   },
   methods: {
@@ -174,8 +178,6 @@ export default {
         });
         this.i++;
         this.todoItems.text = undefined;
-      } else {
-        alert("Вы не ввели текст задачи");
       }
     },
 
@@ -204,22 +206,29 @@ export default {
   watch: {
     todoItems: {
       handler() {
-        if(localStorage.getItem('arrayLocal') !== null){
-          localStorage['arrayLocal'] = JSON.stringify(this.todoItems);
-          localStorage['id'] = JSON.stringify(this.id);
+        if (this.todoItems.length !== 0) {
+          localStorage["arrayLocal"] = JSON.stringify(this.todoItems);
+          localStorage["i"] = JSON.stringify(this.i);
         }
       },
-      deep: true
+      deep: true,
+    },
+  },
+  directives: {
+    focus: {
+      // определение директивы
+      inserted: function (el) {
+        el.focus();
+      },
     },
   },
   created() {
-    if(localStorage.getItem('arrayLocal') !== null){
+    if (localStorage.getItem("arrayLocal") !== null) {
       this.arrayClone = JSON.parse(localStorage.arrayLocal);
-      localStorage['arrayLocal'] = JSON.stringify(this.todoItems);
       this.todoItems = this.arrayClone;
 
-      this.id = JSON.parse(localStorage.id);
-      localStorage['id'] = JSON.stringify(this.id);
+      this.i = JSON.parse(localStorage.i);
+      localStorage["i"] = JSON.stringify(this.i);
     }
   },
   computed: {
@@ -249,7 +258,11 @@ export default {
   display: inline-flex;
   justify-content: space-between;
 }
-.active{
+.active {
   display: none;
+}
+
+.mouse {
+  cursor: pointer;
 }
 </style>
