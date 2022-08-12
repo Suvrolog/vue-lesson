@@ -1,7 +1,7 @@
 <template>
   <div class="sample">
     <div id="headers">
-      <h2 v-show="todoItems.length == 0" v-colored="color">
+      <h2 v-show="todoItems.length == 0" >
         Please add new task
       </h2>
       <h2 v-show="todoItems.length != 0" v-colored:color="color">
@@ -138,8 +138,6 @@
 <script>
 import AppProgressBar from "./components/AppProgressBar.vue";
 import AppCounterTask from "./components/AppCounterTask.vue";
-import AppConvert from "./components/AppConvert.vue";
-import AppButton from "./components/AppButton.vue";
 
 export default {
 
@@ -147,8 +145,6 @@ export default {
   components: {
     "app-progress-bar": AppProgressBar,
     "app-counter-task": AppCounterTask,
-    "app-button": AppButton,
-    "app-convert": AppConvert,
   },
     
   data() {
@@ -163,6 +159,7 @@ export default {
       color: "purple",
     };
   },
+
   methods: {
     doneTask() {
       this.arrayClone = this.todoItems.filter((item) => item.done);

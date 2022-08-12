@@ -13,9 +13,9 @@
 </template>
 
 <script>
-import logMixin from '../mixins/logMixin'
+//import logMixin from '../mixins/logMixin'
 export default {
-  mixins:[logMixin],
+  //mixins:[logMixin],
       props: {
           sum: Number,
           todoLength: Number,

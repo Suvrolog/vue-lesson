@@ -1,11 +1,13 @@
-import { createApp } from 'vue'
+import { createApp } from 'vue/dist/vue.esm-bundler';
+//Ругался на сборку через import { createApp } from 'vue/dist/vue.runtime.esm-bundler', пришлось поменять 
+
 import App from './App.vue'
-import directives from './directives';
+
+import AppPlugin from './plugins/AppPlagin'
 
 const app = createApp(App)
 
-directives.forEach(directive => {
-    app.directive(directive.name, directive);
-  })
 
+
+app.use(AppPlugin)
 app.mount('#app')
