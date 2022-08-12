@@ -1,20 +1,22 @@
 <template>
   <div class="sample">
-    <h2 v-show="todoItems.length == 0">Please add new task</h2>
-    <h2 v-show="todoItems.length != 0">{{ message }}</h2>
-
-    <form class="input-group mb-3" action="" v-on:submit.prevent="filterAll">
+    <div id="headers">
+      <h2 v-show="todoItems.length == 0" v-colored="color">
+        Please add new task
+      </h2>
+      <h2 v-show="todoItems.length != 0" v-colored:color="color">
+        {{ message }}
+      </h2>
+    </div>
+    <form class="input-group mb-3" action="" v-on:submit.prevent="addTask">
       <div class="input-group mb-3">
         <input
           type="text"
           class="form-control"
           v-model.trim="todoItems.text"
           placeholder="Add new Task"
-          v-focus
         />
-        <button v-bind:class="buttonSwitch" v-on:click="addTask" class="btn">
-          Add
-        </button>
+        <button v-bind:class="buttonSwitch" class="btn">Add</button>
       </div>
     </form>
 
@@ -71,24 +73,25 @@
       <form class="input-group mb-3" action="" v-on:submit.prevent="filterTask">
         <div class="input-group mb-3">
           <input
+            v-blur="filterTask"
             placeholder="Search"
             class="form-control"
             type="text"
             v-model.trim="search"
           />
-          <button class="btn btn-primary">Search</button>
         </div>
       </form>
     </div>
 
+    <!-- Item -->
     <ul class="list-group">
       <li class="list-group-item" v-for="item in arrayClone" :key="item.id">
         <div class="mb-1">
           <div class="mb-3">
             <button
               v-bind:class="{
-                'btn-success': item.done == true,
-                'btn-secondary': item.done == false,
+                'btn-success': item.done,
+                'btn-secondary': !item.done,
               }"
               v-on:click="item.done = !item.done"
               class="btn"
@@ -124,37 +127,45 @@
         </div>
       </li>
     </ul>
+    <a class="btn btn-primary myPosition active" href="#headers">^</a>
+  <br>
+     <app-button class="btn btn-primary" v-on:click="exercise3 = !exercise3"  :tag="'button'"> Show Exercise 3 </app-button>
+
+    <app-convert v-show="exercise3"/>
   </div>
 </template>
 
 <script>
 import AppProgressBar from "./components/AppProgressBar.vue";
 import AppCounterTask from "./components/AppCounterTask.vue";
-//import AppRedact from "./components/AppRedact.vue";
-//import AppFilter from "./components/AppFilter.vue";
+import AppConvert from "./components/AppConvert.vue";
+import AppButton from "./components/AppButton.vue";
+
 export default {
+
   name: "App",
   components: {
     "app-progress-bar": AppProgressBar,
     "app-counter-task": AppCounterTask,
-    //"app-redact": AppRedact,
-    //"app-filter": AppFilter,
+    "app-button": AppButton,
+    "app-convert": AppConvert,
   },
+    
   data() {
     return {
-      "btn-basic": false,
-      "btn-primary": true,
       search: "",
       i: 0,
       message: "I suffered for a very long time",
       todoItems: [],
       arrayClone: [],
       isActive: "",
+      exercise3: false,
+      color: "purple",
     };
   },
   methods: {
     doneTask() {
-      this.arrayClone = this.todoItems.filter((item) => item.done == true);
+      this.arrayClone = this.todoItems.filter((item) => item.done);
       return this.arrayClone.length;
     },
 
@@ -194,15 +205,25 @@ export default {
     },
 
     filterTask() {
-      this.arrayClone = this.arrayClone.filter((item) => {
-        return item.text.toLowerCase().includes(this.search.toLowerCase());
-      });
+      if (this.search.length == 0) {
+        this.arrayClone = this.todoItems;
+      } else {
+        this.arrayClone = this.arrayClone.filter((item) => {
+          return item.text.toLowerCase().includes(this.search.toLowerCase());
+        });
+      }
     },
     sum() {
-      let sum = this.todoItems.filter((item) => item.done == true);
+      let sum = this.todoItems.filter((item) => item.done);
       return sum.length;
     },
+
+    transforNum() {
+      let string = this.item.text + 'руб.'
+      return console.log(string);
+    },
   },
+
   watch: {
     todoItems: {
       handler() {
@@ -214,14 +235,7 @@ export default {
       deep: true,
     },
   },
-  directives: {
-    focus: {
-      // определение директивы
-      inserted: function (el) {
-        el.focus();
-      },
-    },
-  },
+
   created() {
     if (localStorage.getItem("arrayLocal") !== null) {
       this.arrayClone = JSON.parse(localStorage.arrayLocal);

@@ -13,7 +13,9 @@
 </template>
 
 <script>
+import logMixin from '../mixins/logMixin'
 export default {
+  mixins:[logMixin],
       props: {
           sum: Number,
           todoLength: Number,
