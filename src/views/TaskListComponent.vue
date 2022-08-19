@@ -1,18 +1,36 @@
 <template>
   <div class="sample">
-    <div id="headers">
-      <h2>Please add new task</h2>
+    <div id="headers" class="myposition mb-3">
+      <span><h2>Please add new task</h2></span>
+
+      <button @click="logout" type="submit" class="btn btn-warning">
+        Logout
+      </button>
     </div>
-    <form class="input-group mb-3" action="" v-on:submit.prevent="addTask">
-      <div class="input-group mb-3">
+    <form v-on:submit.prevent="addTask">
+      <div>
         <input
           type="text"
           class="form-control"
-          v-model.trim="todoItems.text"
+          v-model.trim="todoItems.title"
+          placeholder="Add Title Task"
+        />
+      </div>
+      <div class="mb-3">
+        <textarea
+          type="text"
+          class="form-control"
+          v-model.trim="todoItems.desc"
           placeholder="Add new Task"
         />
-        <button v-bind:class="buttonSwitch" class="btn">Add</button>
       </div>
+      <button
+        type="submit"
+        v-bind:class="buttonSwitch"
+        class="btn mb-3 mywidth"
+      >
+        Add
+      </button>
     </form>
 
     <app-counter-task v-bind:todoLength="todoItems.length" v-bind:sum="sum()" />
@@ -73,6 +91,7 @@
             type="text"
             v-model.trim="search"
           />
+          <button class="btn btn-primary" type="submit">Search</button>
         </div>
       </form>
     </div>
@@ -80,14 +99,43 @@
     <!-- Item -->
     <ul class="list-group">
       <li
+      v-bind:class="{
+                'task-success': item.done,
+                'task-secondary': !item.done,
+              }"
         class="list-group-item"
         v-for="item in arrayClone"
-        :key="item.i"
+        :key="item.id"
         :item="item"
-      >
-        <div class="mb-1">
-          <div class="mb-3">
-            <button
+      ><router-link
+                :to="{
+                  path: `/tasklist/${item.id}`,
+                  query: {
+                    desk: item.desc,
+                    title: item.title,
+                    done: item.done,
+                    id: item.id,
+                  },
+                }"
+                custom
+                v-slot="{ navigate, isActive, isExactActive }"
+              >
+        <div class="mb-1 mouse" :class="[
+                    isActive && 'router-link-active',
+                    isExactActive && 'router-link-exact-active',
+                  ]"
+                  @click="navigate">
+          <div class="mb-3" >
+            <div class="mb-3"
+            >
+              
+                <h3
+                >
+                  Title task: {{ item.title }}
+                </h3>
+              
+            </div>
+            <!-- <button
               v-bind:class="{
                 'btn-success': item.done,
                 'btn-secondary': !item.done,
@@ -96,48 +144,13 @@
               class="btn"
             >
               {{ item.done ? "Completed" : "In order" }}
-            </button>
-            <router-link
-              :to="`/tasklist/${item.i}`"
-              custom
-              v-slot="{ navigate, isActive, isExactActive }"
-            >
-              <span
-                :class="[
-                  isActive && 'router-link-active',
-                  isExactActive && 'router-link-exact-active',
-                ]"
-                @click="navigate"
-                class="mouse"
-                v-on:click="item.isActive = !item.isActive"
-              >
-                {{ item.text }}
-              </span>
-            </router-link>
-            <span class="myPosition">
-              <button class="btn btn-primary" v-on:click="delItem(item)">
-                X
-              </button>
+            </button> -->
+            <span>
+              Task text: {{ item.desc }}
             </span>
           </div>
-          <div
-            v-bind:class="{ active: item.isActive }"
-            class="input-group mb-1"
-          >
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Add new Task"
-              v-model="item.text"
-            />
-            <button
-              v-on:click="item.isActive = !item.isActive"
-              class="btn btn-primary"
-            >
-              Edit
-            </button>
-          </div>
         </div>
+        </router-link>
       </li>
     </ul>
     <a class="btn btn-primary myPosition active" href="#headers">^</a>
@@ -147,6 +160,7 @@
 <script>
 import AppProgressBar from ".././components/AppProgressBar.vue";
 import AppCounterTask from ".././components/AppCounterTask.vue";
+import axios from "axios";
 
 export default {
   name: "App",
@@ -158,10 +172,13 @@ export default {
   data() {
     return {
       search: "",
-      i: 0,
+      i: 1,
       todoItems: [],
       arrayClone: [],
-      isActive: "",
+      done: "",
+      desc: "",
+      title: "",
+      created: new Date().toLocaleString(),
     };
   },
 
@@ -170,27 +187,53 @@ export default {
       this.arrayClone = this.todoItems.filter((item) => item.done);
       return this.arrayClone.length;
     },
-
-    delItem(item) {
-      var myIndex = this.arrayClone.indexOf(item);
-      if (myIndex !== -1) {
-        this.arrayClone.splice(myIndex, 1);
-      }
+    logout() {
+      localStorage.removeItem("user");
+      this.$router.push("/");
     },
 
     addTask() {
       if (
-        this.todoItems.text !== undefined &&
-        this.todoItems.text.length !== 0
+        this.todoItems.desc !== undefined &&
+        this.todoItems.desc.length !== 0 &&
+        this.todoItems.title != undefined &&
+        this.todoItems.title !== 0
       ) {
         this.todoItems.push({
-          i: this.i,
-          text: this.todoItems.text,
+          id: this.i,
+          desc: this.todoItems.desc,
           done: false,
-          isActive: true,
+          title: this.todoItems.title,
         });
+        (this.desc = this.todoItems.desc),
+          (this.done = false),
+          (this.title = this.todoItems.title),
+          axios
+            .post(
+              "http://localhost:3000/todoItems",
+              {
+                id: this.i,
+                desc: this.desc,
+                done: this.done,
+                title: this.title,
+                created: this.created,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              }
+            )
+            .then(function (response) {
+              console.log(response);
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
         this.i++;
-        this.todoItems.text = undefined;
+        this.todoItems.desc = undefined;
+        this.todoItems.title = undefined;
+        this.arrayClone = this.todoItems;
       }
     },
 
@@ -211,18 +254,13 @@ export default {
         this.arrayClone = this.todoItems;
       } else {
         this.arrayClone = this.arrayClone.filter((item) => {
-          return item.text.toLowerCase().includes(this.search.toLowerCase());
+          return item.desc.toLowerCase().includes(this.search.toLowerCase());
         });
       }
     },
     sum() {
       let sum = this.todoItems.filter((item) => item.done);
       return sum.length;
-    },
-
-    transforNum() {
-      let string = this.item.text + "руб.";
-      return console.log(string);
     },
   },
 
@@ -231,29 +269,39 @@ export default {
       handler() {
         if (this.todoItems.length !== 0) {
           localStorage["arrayLocal"] = JSON.stringify(this.todoItems);
-          localStorage["i"] = JSON.stringify(this.i);
+          localStorage["id"] = JSON.stringify(this.i);
         }
       },
       deep: true,
     },
   },
 
-  created() {
-    if (localStorage.getItem("arrayLocal") !== null) {
-      this.arrayClone = JSON.parse(localStorage.arrayLocal);
-      this.todoItems = this.arrayClone;
-
-      this.i = JSON.parse(localStorage.i);
-      localStorage["i"] = JSON.stringify(this.i);
-    }
-  },
   computed: {
     buttonSwitch() {
       return {
-        "btn-secondary": this.todoItems.text == undefined,
-        "btn-primary": this.todoItems.text != undefined,
+        "btn-secondary": this.todoItems.desc == undefined,
+        "btn-primary": this.todoItems.desc != undefined,
       };
     },
+  },
+  beforeRouteEnter(to, from, next) {
+    if (localStorage.getItem("user") !== null) {
+      next(true);
+    }
+  },
+  mounted() {
+    axios
+      .get("http://localhost:3000/todoItems")
+      .then((response) => {
+        this.todoItems = response.data;
+
+        if (response.data.length !== 0) {
+          const ids = response.data.map(item => item.id);
+          this.i = Math.max.apply(ids) + 1;
+          this.arrayClone = this.todoItems;
+        }
+      })
+      .catch((error) => console.log(error));
   },
 };
 </script>
@@ -267,6 +315,20 @@ export default {
 }
 .active {
   display: none;
+}
+
+.myposition {
+  display: flex;
+  justify-content: space-between;
+}
+.mywidth {
+  width: 100%;
+}
+.task-success{
+  background-color: rgb(25,135,84);
+}
+.task-secondary{
+  background-color: rgb(108,117,125);
 }
 
 .mouse {

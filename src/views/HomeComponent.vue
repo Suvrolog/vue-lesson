@@ -1,24 +1,103 @@
 <template>
-  <form class="row gx-3 gy-2 align-items-center centralize">
-  <div class="col-sm-3">
-    <label class="visually-hidden" for="specificSizeInputName">Name</label>
-    <input type="text" class="form-control" id="specificSizeInputName" placeholder="Name">
+  <div>
+    <app-menu />
+    <form
+      class="row gx-3 gy-2 align-items-center centralize"
+      @submit.prevent="onSubmit"
+    >
+      <div class="col-sm-3">
+        <label class="visually-hidden" for="specificSizeInputGroupUsername"
+          >email</label
+        >
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            v-model="formData.email"
+            id="specificSizeInputGroupUsername"
+            placeholder="Email"
+          />
+        </div>
+      </div>
+      <div class="col-sm-3">
+        <label class="visually-hidden" for="specificSizeInputName"
+          >Password</label
+        >
+        <input
+          type="text"
+          class="form-control"
+          v-model="formData.password"
+          id="specificSizeInputName"
+          placeholder="Password"
+        />
+      </div>
+      <div class="col-auto">
+        <router-link
+          :to="`/tasklist`"
+          custom
+          v-slot="{ isActive, isExactActive }"
+        >
+          <button
+            :class="[
+              isActive && 'router-link-active',
+              isExactActive && 'router-link-exact-active',
+            ]"
+            @click="submit"
+            type="submit"
+            class="btn btn-primary"
+          >
+            {{ loginForm ? "Login" : "Register" }}
+          </button>
+        </router-link>
+      </div>
+    </form>
   </div>
-  <div class="col-sm-3">
-    <label class="visually-hidden" for="specificSizeInputGroupUsername">Username</label>
-    <div class="input-group">
-      <div class="input-group-text">@</div>
-      <input type="text" class="form-control" id="specificSizeInputGroupUsername" placeholder="Username">
-    </div>
-  </div>
-  <div class="col-auto">
-    <button type="submit" class="btn btn-primary">Login</button>
-  </div>
-</form>
 </template>
 
 <script>
+import axios from "axios";
+import AppMenu from ".././components/AppMenu.vue";
 
+export default {
+  components: {
+    "app-menu": AppMenu,
+  },
+  data() {
+    return {
+      email: "",
+      password: "",
+      loginForm: false,
+      setUser: "",
+      formData: { email: this.email, password: this.password },
+    };
+  },
+  methods: {
+    async onSubmit() {
+      localStorage.setItem("user", JSON.stringify(this.formData));
+      await axios
+        .post("http://localhost:3000/formData", this.formData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      this.$router.push("../tasklist");
+    },
+  },
+
+  mounted() {
+    if (JSON.parse(localStorage.getItem("user") != null)) {
+      this.loginForm = true;
+    } else {
+      this.loginForm = false;
+    }
+  },
+};
 </script>
 
 <style scoped>
