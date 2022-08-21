@@ -4,9 +4,9 @@
 
     <div class="list-group-item itemWidth">
       <div class="mb-3 itemTitle">
-        <h3>{{ titleItem }}</h3>
+        <h3>{{ itItem[0].title }}</h3>
         <span class="myPosition">
-          <button class="btn btn-primary" v-on:click="delItem(itemId)">
+          <button class="btn btn-primary" v-on:click="delItem()">
             X
           </button>
         </span>
@@ -15,17 +15,20 @@
         <div class="mb-3">
           <button
             v-bind:class="{
-              'btn-success': itemDone,
-              'btn-secondary': !itemDone,
+              'btn-success': this.itItem[0].done,
+              'btn-secondary': !this.itItem[0].done,
             }"
-            v-on:click="itemDone = !itemDone, taskEdit(itemId, deskItem, itemDone, titleItem, updated)"
+            v-on:click="
+              (this.itItem[0].done = !this.itItem[0].done),
+                taskEdit()
+            "
             class="btn"
           >
-            {{ itemDone ? "Completed" : "In order" }}
+            {{ this.itItem[0].done ? "Completed" : "In order" }}
           </button>
 
           <span class="mouse" v-on:click="redact = !redact">
-            {{ deskItem }}
+            {{ itItem[0].desc }}
           </span>
         </div>
         <div v-bind:class="{ activeRed: redact }" class="input-group mb-1">
@@ -33,11 +36,12 @@
             type="text"
             class="form-control"
             placeholder="Add new Task"
-            v-model="deskItem"
+            v-model="itItem[0].desc"
           />
           <button
-            v-on:click="redact = !redact,
-              taskEdit(itemId, deskItem, itemDone, titleItem, updated)
+            v-on:click="
+              (redact = !redact),
+                taskEdit()
             "
             class="btn btn-primary"
           >
@@ -47,67 +51,63 @@
       </div>
     </div>
     <!-- sidebar -->
-    <app-sidebar v-bind:arrayClone="arrayClone" />
+    <app-sidebar v-bind:arrayClone="$store.state.arrayClone" />
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import AppSidebar from ".././components/AppSidebar.vue";
+import { mapState } from "vuex";
 export default {
   components: {
     "app-sidebar": AppSidebar,
   },
   data() {
     return {
-      arrayClone: [],
+      itItem: "",
       redact: false,
-      deskItem: "",
-      itemId: "",
-      titleItem: "",
-      itemDone: Boolean(),
-      updated: new Date().toLocaleString(),
+      // deskItem: "",
+      // itemId: "",
+      // titleItem: "",
+      // itemDone: Boolean(),
+      id: this.$router.currentRoute.value.params.id,
     };
+  },
+  computed: {
+    ...mapState(["todoItems", "arrayClone", "created", "updated"]),
   },
 
   methods: {
-    async taskEdit(itemId) {
-      await axios.put(`http://localhost:3000/todoItems/${itemId}`, {
-        id: itemId,
-        desc: this.deskItem,
-        done: this.itemDone,
-        title: this.titleItem,
+    async taskEdit() {
+      console.log(this.itItem)
+      await axios.put(`http://localhost:3000/todoItems/${this.id}`, {
+        id: this.id,
+        desc: this.itItem[0].desc,
+        done: this.itItem[0].done,
+        title: this.itItem[0].title,
         updated: this.updated,
       });
     },
 
-    async delItem(itemId) {
-      await axios.delete(`http://localhost:3000/todoItems/${itemId}`);
+    async delItem() {
+      await axios.delete(`http://localhost:3000/todoItems/${this.id}`);
       this.$router.push("/tasklist");
     },
   },
   watch: {
     $route(toR) {
-      this.deskItem = toR.query["desk"];
-      this.itemId = toR.query["id"];
-      this.titleItem = toR.query["title"];
-      this.itemDone = toR.query["done"] === 'true';
+      this.id = toR.params["id"];
+      this.itItem = this.$store.state.arrayClone.filter((item) => {
+        return item.id == this.id;
+      });
     },
   },
-  mounted() {
-    this.deskItem = this.$route.query.desk;
-    this.itemId = this.$route.query.id;
-    this.titleItem = this.$route.query.title;
-    this.itemDone = this.$route.query.done === "true";
-    console.log(this.$route.query);
-  },
+
   created() {
-    axios
-      .get("http://localhost:3000/todoItems")
-      .then((response) => {
-        this.arrayClone = response.data;
-      })
-      .catch((error) => console.log(error));
+    this.itItem = this.$store.state.arrayClone.filter((item) => {
+        return item.id == this.id;
+    });
   },
 };
 </script>
@@ -124,7 +124,7 @@ export default {
   display: flex;
   margin-top: 5%;
 }
-.activeRed{
+.activeRed {
   display: none;
 }
 .itemWidth {

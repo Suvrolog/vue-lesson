@@ -20,7 +20,7 @@
       <li
         active-class="activeLink"
         class="list-group-item"
-        v-for="item in arrayClone"
+        v-for="item in  $store.state.arrayClone"
         :key="item.i"
         :item="item"
       >
@@ -29,12 +29,7 @@
             <router-link
               :to="{
                 path: `/tasklist/${item.id}`,
-                query: {
-                  desk: item.desc,
-                  title: item.title,
-                  done: item.done,
-                  id: item.id,
-                },
+     
               }"
               custom
               v-slot="{ navigate, isActive, isExactActive }"

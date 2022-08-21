@@ -12,7 +12,7 @@
         <input
           type="text"
           class="form-control"
-          v-model.trim="todoItems.title"
+          v-model.trim="$store.state.todoItems.title"
           placeholder="Add Title Task"
         />
       </div>
@@ -20,7 +20,7 @@
         <textarea
           type="text"
           class="form-control"
-          v-model.trim="todoItems.desc"
+          v-model.trim="$store.state.todoItems.desc"
           placeholder="Add new Task"
         />
       </div>
@@ -33,11 +33,11 @@
       </button>
     </form>
 
-    <app-counter-task v-bind:todoLength="todoItems.length" v-bind:sum="sum()" />
+    <app-counter-task v-bind:todoLength="$store.state.todoItems.length" v-bind:sum="sum()" />
 
     <app-progress-bar
       class="mb-3"
-      v-bind:max="todoItems.length"
+      v-bind:max="$store.state.todoItems.length"
       v-bind:complete="sum()"
     ></app-progress-bar>
 
@@ -104,18 +104,13 @@
                 'task-secondary': !item.done,
               }"
         class="list-group-item"
-        v-for="item in arrayClone"
+        v-for="item in $store.state.arrayClone"
         :key="item.id"
         :item="item"
       ><router-link
                 :to="{
                   path: `/tasklist/${item.id}`,
-                  query: {
-                    desk: item.desc,
-                    title: item.title,
-                    done: item.done,
-                    id: item.id,
-                  },
+                
                 }"
                 custom
                 v-slot="{ navigate, isActive, isExactActive }"
@@ -131,20 +126,10 @@
               
                 <h3
                 >
-                  Title task: {{ item.title }}
+                  Title task: {{ item.title }} 
                 </h3>
               
             </div>
-            <!-- <button
-              v-bind:class="{
-                'btn-success': item.done,
-                'btn-secondary': !item.done,
-              }"
-              v-on:click="item.done = !item.done"
-              class="btn"
-            >
-              {{ item.done ? "Completed" : "In order" }}
-            </button> -->
             <span>
               Task text: {{ item.desc }}
             </span>
@@ -161,6 +146,7 @@
 import AppProgressBar from ".././components/AppProgressBar.vue";
 import AppCounterTask from ".././components/AppCounterTask.vue";
 import axios from "axios";
+import { mapState } from 'vuex'
 
 export default {
   name: "App",
@@ -172,20 +158,28 @@ export default {
   data() {
     return {
       search: "",
-      i: 1,
-      todoItems: [],
-      arrayClone: [],
+      i:1,
       done: "",
       desc: "",
       title: "",
-      created: new Date().toLocaleString(),
     };
+  },
+
+    computed: {
+      ...mapState(["todoItems","arrayClone","created","updated"]),
+    buttonSwitch() {
+      
+      return {
+        "btn-secondary": this.$store.state.todoItems.desc == undefined,
+        "btn-primary": this.$store.state.todoItems.desc != undefined,
+      };
+    },
   },
 
   methods: {
     doneTask() {
-      this.arrayClone = this.todoItems.filter((item) => item.done);
-      return this.arrayClone.length;
+      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
+      return this.$store.state.arrayClone.length;
     },
     logout() {
       localStorage.removeItem("user");
@@ -194,20 +188,20 @@ export default {
 
     addTask() {
       if (
-        this.todoItems.desc !== undefined &&
-        this.todoItems.desc.length !== 0 &&
-        this.todoItems.title != undefined &&
-        this.todoItems.title !== 0
+        this.$store.state.todoItems.desc !== undefined &&
+        this.$store.state.todoItems.desc.length !== 0 &&
+        this.$store.state.todoItems.title != undefined &&
+        this.$store.state.todoItems.title !== 0
       ) {
         this.todoItems.push({
           id: this.i,
-          desc: this.todoItems.desc,
+          desc: this.$store.state.todoItems.desc,
           done: false,
-          title: this.todoItems.title,
+          title: this.$store.state.todoItems.title,
         });
-        (this.desc = this.todoItems.desc),
+        (this.desc = this.$store.state.todoItems.desc),
           (this.done = false),
-          (this.title = this.todoItems.title),
+          (this.title = this.$store.state.todoItems.title),
           axios
             .post(
               "http://localhost:3000/todoItems",
@@ -216,7 +210,7 @@ export default {
                 desc: this.desc,
                 done: this.done,
                 title: this.title,
-                created: this.created,
+                created: this.$store.state.created,
               },
               {
                 headers: {
@@ -231,35 +225,36 @@ export default {
               console.log(error);
             });
         this.i++;
-        this.todoItems.desc = undefined;
-        this.todoItems.title = undefined;
-        this.arrayClone = this.todoItems;
+        this.$store.state.todoItems.desc = undefined;
+        this.$store.state.todoItems.title = undefined;
+        this.$store.state.arrayClone = this.$store.state.todoItems;
       }
     },
 
     filterFalse() {
-      this.arrayClone = this.todoItems.filter((item) => !item.done);
+      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => !item.done);
+
     },
 
     filterTrue() {
-      this.arrayClone = this.todoItems.filter((item) => item.done);
+      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
     },
 
     filterAll() {
-      this.arrayClone = this.todoItems;
+      this.$store.state.arrayClone = this.$store.state.todoItems;
     },
 
     filterTask() {
       if (this.search.length == 0) {
-        this.arrayClone = this.todoItems;
+        this.$store.state.arrayClone = this.$store.state.todoItems;
       } else {
-        this.arrayClone = this.arrayClone.filter((item) => {
+        this.$store.state.arrayClone = this.$store.state.arrayClone.filter((item) => {
           return item.desc.toLowerCase().includes(this.search.toLowerCase());
         });
       }
     },
     sum() {
-      let sum = this.todoItems.filter((item) => item.done);
+      let sum = this.$store.state.todoItems.filter((item) => item.done);
       return sum.length;
     },
   },
@@ -267,8 +262,8 @@ export default {
   watch: {
     todoItems: {
       handler() {
-        if (this.todoItems.length !== 0) {
-          localStorage["arrayLocal"] = JSON.stringify(this.todoItems);
+        if (this.$store.state.todoItems.length !== 0) {
+          localStorage["arrayLocal"] = JSON.stringify(this.$store.state.todoItems);
           localStorage["id"] = JSON.stringify(this.i);
         }
       },
@@ -276,14 +271,7 @@ export default {
     },
   },
 
-  computed: {
-    buttonSwitch() {
-      return {
-        "btn-secondary": this.todoItems.desc == undefined,
-        "btn-primary": this.todoItems.desc != undefined,
-      };
-    },
-  },
+
   beforeRouteEnter(to, from, next) {
     if (localStorage.getItem("user") !== null) {
       next(true);
@@ -293,12 +281,12 @@ export default {
     axios
       .get("http://localhost:3000/todoItems")
       .then((response) => {
-        this.todoItems = response.data;
+        this.$store.state.todoItems = response.data;
 
         if (response.data.length !== 0) {
           const ids = response.data.map(item => item.id);
           this.i = Math.max.apply(ids) + 1;
-          this.arrayClone = this.todoItems;
+          this.$store.state.arrayClone = this.$store.state.todoItems;
         }
       })
       .catch((error) => console.log(error));
