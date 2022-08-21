@@ -40,7 +40,7 @@
       v-bind:max="$store.state.todoItems.length"
       v-bind:complete="sum()"
     ></app-progress-bar>
-
+    <app-search/>
     <!-- filter -->
     <div>
       <div
@@ -83,17 +83,7 @@
           >Uncompleted Task</label
         >
       </div>
-      <form class="input-group mb-3" action="" v-on:submit.prevent="filterTask">
-        <div class="input-group mb-3">
-          <input
-            placeholder="Search"
-            class="form-control"
-            type="text"
-            v-model.trim="search"
-          />
-          <button class="btn btn-primary" type="submit">Search</button>
-        </div>
-      </form>
+      
     </div>
 
     <!-- Item -->
@@ -145,19 +135,21 @@
 <script>
 import AppProgressBar from ".././components/AppProgressBar.vue";
 import AppCounterTask from ".././components/AppCounterTask.vue";
+import AppSearch from ".././components/AppSearch.vue";
 import axios from "axios";
-import { mapState } from 'vuex'
+import { mapMutations, mapState } from 'vuex'
 
 export default {
   name: "App",
   components: {
     "app-progress-bar": AppProgressBar,
     "app-counter-task": AppCounterTask,
+    "app-search":AppSearch,
   },
 
   data() {
     return {
-      search: "",
+
       i:1,
       done: "",
       desc: "",
@@ -166,7 +158,7 @@ export default {
   },
 
     computed: {
-      ...mapState(["todoItems","arrayClone","created","updated"]),
+      ...mapState(["todoItems","arrayClone","created","updated","search"]),
     buttonSwitch() {
       
       return {
@@ -174,9 +166,11 @@ export default {
         "btn-primary": this.$store.state.todoItems.desc != undefined,
       };
     },
+
   },
 
   methods: {
+    ...mapMutations(["addTask","filterFalse","filterTrue","filterAll"]),
     doneTask() {
       this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
       return this.$store.state.arrayClone.length;
@@ -185,74 +179,7 @@ export default {
       localStorage.removeItem("user");
       this.$router.push("/");
     },
-
-    addTask() {
-      if (
-        this.$store.state.todoItems.desc !== undefined &&
-        this.$store.state.todoItems.desc.length !== 0 &&
-        this.$store.state.todoItems.title != undefined &&
-        this.$store.state.todoItems.title !== 0
-      ) {
-        this.todoItems.push({
-          id: this.i,
-          desc: this.$store.state.todoItems.desc,
-          done: false,
-          title: this.$store.state.todoItems.title,
-        });
-        (this.desc = this.$store.state.todoItems.desc),
-          (this.done = false),
-          (this.title = this.$store.state.todoItems.title),
-          axios
-            .post(
-              "http://localhost:3000/todoItems",
-              {
-                id: this.i,
-                desc: this.desc,
-                done: this.done,
-                title: this.title,
-                created: this.$store.state.created,
-              },
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }
-            )
-            .then(function (response) {
-              console.log(response);
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-        this.i++;
-        this.$store.state.todoItems.desc = undefined;
-        this.$store.state.todoItems.title = undefined;
-        this.$store.state.arrayClone = this.$store.state.todoItems;
-      }
-    },
-
-    filterFalse() {
-      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => !item.done);
-
-    },
-
-    filterTrue() {
-      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
-    },
-
-    filterAll() {
-      this.$store.state.arrayClone = this.$store.state.todoItems;
-    },
-
-    filterTask() {
-      if (this.search.length == 0) {
-        this.$store.state.arrayClone = this.$store.state.todoItems;
-      } else {
-        this.$store.state.arrayClone = this.$store.state.arrayClone.filter((item) => {
-          return item.desc.toLowerCase().includes(this.search.toLowerCase());
-        });
-      }
-    },
+    
     sum() {
       let sum = this.$store.state.todoItems.filter((item) => item.done);
       return sum.length;
@@ -285,7 +212,7 @@ export default {
 
         if (response.data.length !== 0) {
           const ids = response.data.map(item => item.id);
-          this.i = Math.max.apply(ids) + 1;
+          this.$store.state.i = Math.max.apply(ids) + 1;
           this.$store.state.arrayClone = this.$store.state.todoItems;
         }
       })

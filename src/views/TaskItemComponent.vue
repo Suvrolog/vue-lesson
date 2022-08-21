@@ -67,10 +67,6 @@ export default {
     return {
       itItem: "",
       redact: false,
-      // deskItem: "",
-      // itemId: "",
-      // titleItem: "",
-      // itemDone: Boolean(),
       id: this.$router.currentRoute.value.params.id,
     };
   },

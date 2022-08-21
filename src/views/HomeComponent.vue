@@ -13,7 +13,7 @@
           <input
             type="text"
             class="form-control"
-            v-model="formData.email"
+            v-model="$store.state.formData.email"
             id="specificSizeInputGroupUsername"
             placeholder="Email"
           />
@@ -26,7 +26,7 @@
         <input
           type="text"
           class="form-control"
-          v-model="formData.password"
+          v-model="$store.state.formData.password"
           id="specificSizeInputName"
           placeholder="Password"
         />
@@ -64,18 +64,15 @@ export default {
   },
   data() {
     return {
-      email: "",
-      password: "",
       loginForm: false,
       setUser: "",
-      formData: { email: this.email, password: this.password },
     };
   },
   methods: {
     async onSubmit() {
-      localStorage.setItem("user", JSON.stringify(this.formData));
+      localStorage.setItem("user", JSON.stringify(this.$store.state.formData));
       await axios
-        .post("http://localhost:3000/formData", this.formData, {
+        .post("http://localhost:3000/formData", this.$store.state.formData, {
           headers: {
             "Content-Type": "application/json",
           },
