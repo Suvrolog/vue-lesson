@@ -89,7 +89,7 @@ export default {
 
   mounted() {
     if (JSON.parse(localStorage.getItem("user") != null)) {
-      this.loginForm = true;
+      this.$router.push("../tasklist");
     } else {
       this.loginForm = false;
     }

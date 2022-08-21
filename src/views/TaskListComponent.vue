@@ -159,8 +159,8 @@ export default {
 
     computed: {
       ...mapState(["todoItems","arrayClone","created","updated","search"]),
-    buttonSwitch() {
       
+    buttonSwitch() {
       return {
         "btn-secondary": this.$store.state.todoItems.desc == undefined,
         "btn-primary": this.$store.state.todoItems.desc != undefined,
@@ -171,6 +171,7 @@ export default {
 
   methods: {
     ...mapMutations(["addTask","filterFalse","filterTrue","filterAll"]),
+
     doneTask() {
       this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
       return this.$store.state.arrayClone.length;
@@ -202,8 +203,12 @@ export default {
   beforeRouteEnter(to, from, next) {
     if (localStorage.getItem("user") !== null) {
       next(true);
-    }
+    }else{
+      next("/");
+    } 
   },
+    
+  
   mounted() {
     axios
       .get("http://localhost:3000/todoItems")
