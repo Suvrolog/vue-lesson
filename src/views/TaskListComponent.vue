@@ -33,14 +33,17 @@
       </button>
     </form>
 
-    <app-counter-task v-bind:todoLength="$store.state.todoItems.length" v-bind:sum="sum()" />
+    <app-counter-task
+      v-bind:todoLength="$store.state.todoItems.length"
+      v-bind:sum="sum()"
+    />
 
     <app-progress-bar
       class="mb-3"
       v-bind:max="$store.state.todoItems.length"
       v-bind:complete="sum()"
     ></app-progress-bar>
-    <app-search/>
+    <app-search />
     <!-- filter -->
     <div>
       <div
@@ -83,48 +86,42 @@
           >Uncompleted Task</label
         >
       </div>
-      
     </div>
 
     <!-- Item -->
     <ul class="list-group">
       <li
-      v-bind:class="{
-                'task-success': item.done,
-                'task-secondary': !item.done,
-              }"
+        v-bind:class="{
+          'task-success': item.done,
+          'task-secondary': !item.done,
+        }"
         class="list-group-item"
         v-for="item in $store.state.arrayClone"
         :key="item.id"
         :item="item"
-      ><router-link
-                :to="{
-                  path: `/tasklist/${item.id}`,
-                
-                }"
-                custom
-                v-slot="{ navigate, isActive, isExactActive }"
-              >
-        <div class="mb-1 mouse" :class="[
-                    isActive && 'router-link-active',
-                    isExactActive && 'router-link-exact-active',
-                  ]"
-                  @click="navigate">
-          <div class="mb-3" >
-            <div class="mb-3"
-            >
-              
-                <h3
-                >
-                  Title task: {{ item.title }} 
-                </h3>
-              
+      >
+        <router-link
+          :to="{
+            path: `/tasklist/${item.id}`,
+          }"
+          custom
+          v-slot="{ navigate, isActive, isExactActive }"
+        >
+          <div
+            class="mb-1 mouse"
+            :class="[
+              isActive && 'router-link-active',
+              isExactActive && 'router-link-exact-active',
+            ]"
+            @click="navigate"
+          >
+            <div class="mb-3">
+              <div class="mb-3">
+                <h3>Title task: {{ item.title }}</h3>
+              </div>
+              <span> Task text: {{ item.desc }} </span>
             </div>
-            <span>
-              Task text: {{ item.desc }}
-            </span>
           </div>
-        </div>
         </router-link>
       </li>
     </ul>
@@ -136,51 +133,38 @@
 import AppProgressBar from ".././components/AppProgressBar.vue";
 import AppCounterTask from ".././components/AppCounterTask.vue";
 import AppSearch from ".././components/AppSearch.vue";
-import axios from "axios";
-import { mapMutations, mapState } from 'vuex'
+//import axios from "axios";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
   name: "App",
   components: {
     "app-progress-bar": AppProgressBar,
     "app-counter-task": AppCounterTask,
-    "app-search":AppSearch,
+    "app-search": AppSearch,
   },
 
-  data() {
-    return {
+  computed: {
+    ...mapState(["todoItems", "arrayClone", "created", "updated", "search"]),
 
-      i:1,
-      done: "",
-      desc: "",
-      title: "",
-    };
-  },
-
-    computed: {
-      ...mapState(["todoItems","arrayClone","created","updated","search"]),
-      
     buttonSwitch() {
       return {
         "btn-secondary": this.$store.state.todoItems.desc == undefined,
         "btn-primary": this.$store.state.todoItems.desc != undefined,
       };
     },
-
   },
 
   methods: {
-    ...mapMutations(["addTask","filterFalse","filterTrue","filterAll"]),
+    ...mapMutations(["filterFalse", "filterTrue", "filterAll","clearTask"]),
+    ...mapActions(["addTask", "mounted"]),
 
-    doneTask() {
-      this.$store.state.arrayClone = this.$store.state.todoItems.filter((item) => item.done);
-      return this.$store.state.arrayClone.length;
-    },
     logout() {
       localStorage.removeItem("user");
       this.$router.push("/");
     },
     
+
     sum() {
       let sum = this.$store.state.todoItems.filter((item) => item.done);
       return sum.length;
@@ -191,7 +175,9 @@ export default {
     todoItems: {
       handler() {
         if (this.$store.state.todoItems.length !== 0) {
-          localStorage["arrayLocal"] = JSON.stringify(this.$store.state.todoItems);
+          localStorage["arrayLocal"] = JSON.stringify(
+            this.$store.state.todoItems
+          );
           localStorage["id"] = JSON.stringify(this.i);
         }
       },
@@ -199,29 +185,15 @@ export default {
     },
   },
 
-
   beforeRouteEnter(to, from, next) {
     if (localStorage.getItem("user") !== null) {
       next(true);
-    }else{
+    } else {
       next("/");
-    } 
+    }
   },
-    
-  
   mounted() {
-    axios
-      .get("http://localhost:3000/todoItems")
-      .then((response) => {
-        this.$store.state.todoItems = response.data;
-
-        if (response.data.length !== 0) {
-          const ids = response.data.map(item => item.id);
-          this.$store.state.i = Math.max.apply(ids) + 1;
-          this.$store.state.arrayClone = this.$store.state.todoItems;
-        }
-      })
-      .catch((error) => console.log(error));
+    this.$store.dispatch("mountTodo");
   },
 };
 </script>
@@ -244,11 +216,11 @@ export default {
 .mywidth {
   width: 100%;
 }
-.task-success{
-  background-color: rgb(25,135,84);
+.task-success {
+  background-color: rgb(25, 135, 84);
 }
-.task-secondary{
-  background-color: rgb(108,117,125);
+.task-secondary {
+  background-color: rgb(108, 117, 125);
 }
 
 .mouse {

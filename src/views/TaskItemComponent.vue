@@ -66,6 +66,7 @@ export default {
   data() {
     return {
       itItem: "",
+
       redact: false,
       id: this.$router.currentRoute.value.params.id,
     };

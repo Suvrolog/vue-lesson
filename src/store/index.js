@@ -5,8 +5,8 @@ const store = createStore({
         return {
             email: "",
             password: "",
-            formData: {  },
-            i: 1,
+            formData: {},
+            i: 0,
             search: "",
             todoItems: [],
             arrayClone: [],
@@ -14,11 +14,57 @@ const store = createStore({
             updated: new Date().toLocaleString(),
         }
     },
-    actions:{
+    actions: {
+        async addTask({commit, state}) {
+            commit("pushTask"),
+            await axios
+                .post(
+                    "http://localhost:3000/todoItems",
+                    {
+                        id: state.i,
+                        desc: state.desc,
+                        done: state.done,
+                        title: state.title,
+                        created:state.created,
+                    },
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    }
+                )
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+            commit("clearTask")
+        },
 
+        mountTodo({commit}) {
+            axios
+                .get("http://localhost:3000/todoItems")
+                .then((response) => {
+                    commit("mountTask",response.data)
+                })
+                .catch((error) => console.log(error));
+        },
     },
     mutations: {
-        addTask(state) {
+        mountTask(state,payload){
+            state.todoItems = payload;
+
+            if (payload.length !== 0) {
+                const ids = payload.map(item => item.id);
+                state.i = Math.max.apply(ids) + 1;
+                state.arrayClone = state.todoItems;
+            }
+        },
+        updateMessage ( message) {
+            this.itItem.desc = message
+        },
+        pushTask(state) {
             if (
                 state.todoItems.desc !== undefined &&
                 state.todoItems.desc.length !== 0 &&
@@ -31,36 +77,19 @@ const store = createStore({
                     done: false,
                     title: state.todoItems.title,
                 });
-                (state.desc = state.todoItems.desc),
-                    (state.done = false),
-                    (state.title = state.todoItems.title),
-                axios
-                        .post(
-                            "http://localhost:3000/todoItems",
-                            {
-                                id: state.i,
-                                desc: state.desc,
-                                done: state.done,
-                                title: state.title,
-                                created: state.created,
-                            },
-                            {
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                            }
-                        )
-                        .then(function (response) {
-                            console.log(response);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                state.i++;
-                state.todoItems.desc = undefined;
-                state.todoItems.title = undefined;
-                state.arrayClone = state.todoItems;
+                state.desc = state.todoItems.desc,
+                state.done = false,
+                state.title = state.todoItems.title;
+
+                 state.i++;
+                 state.arrayClone = state.todoItems;
+            
             }
+        },
+        
+        clearTask(state){
+            state.todoItems.desc = '',
+            state.todoItems.title = ''
         },
         filterFalse(state) {
             state.arrayClone = state.todoItems.filter((item) => !item.done);
@@ -87,7 +116,10 @@ const store = createStore({
                 );
             }
         },
-       
+        thisTask: state => {
+            return state.arrayClone;
+        },
+
     }
 
 })
