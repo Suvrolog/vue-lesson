@@ -1,36 +1,18 @@
 <template>
   <section class="itItem">
     <div>
-      <h3>Название товара</h3>
+      <h3>{{ this.itItem[0].title }}</h3>
       <div class="itItem__top">
         <div class="itItem__carousel">
           <app-carousel v-bind:itemList="this.itItem" />
         </div>
         <div class="itItem__buy">
-          <p>Цена: {{ this.itItem[0].price }} $</p>
+          <p>Цена: {{ sumPrice(this.itItem[0]) }} $</p>
 
           <app-counter-item
             v-bind:item="itItem[0]"
             v-bind:id="this.itItem[0].id"
           />
-          <router-link
-            :to="{
-              path: `/basket`,
-            }"
-            custom
-            v-slot="{ navigate, isActive, isExactActive }"
-          >
-            <button
-              :class="[
-                isActive && 'router-link-active',
-                isExactActive && 'router-link-exact-active',
-              ]"
-              @click="navigate"
-              class="itItem__button-buy"
-            >
-              Купить
-            </button>
-          </router-link>
         </div>
       </div>
 
@@ -89,7 +71,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import AppCarousel from ".././components/AppCarousel.vue";
 import AppCounterItem from "../components/AppCounterItem.vue";
 import AppTopItem from "../components/AppTopItem.vue";
@@ -110,23 +92,46 @@ export default {
     "app-top-item": AppTopItem,
   },
   computed: {
-    ...mapState(["itemList"]),
+    ...mapState(["itemList","listBasket"]),
   },
   methods:{
-    
+    ...mapMutations(["getItem"]),
+       sumPrice(item) {
+            if (this.listBasket.length == 0) {
+              return item.price;
+            } else {
+              let needItem = this.listBasket.filter(
+                (product) => product.id == item.id
+              );
+              if (needItem.length > 1) {
+                return (Math.ceil(((item.price * needItem.length)*100))/100);
+              } else {
+                return item.price;
+              }
+            }
+          },
   },
   watch: {
     $route(toR) {
       this.id = toR.params["id"];
-      this.itItem = this.$store.state.itemList.filter((item) => {
+      this.itItem = this.itemList.filter((item) => {
         return item.id == this.id;
       });
     },
   },
-  created() {
-    this.itItem = this.$store.state.itemList.filter((item) => {
+    created() {
+    if (JSON.parse(localStorage.getItem("listBasket") != null))
+      this.$store.state.listBasket = JSON.parse(
+        localStorage.getItem("listBasket")
+      );
+      if (JSON.parse(localStorage.getItem("itemList") != null))
+      this.$store.state.itemList = JSON.parse(
+        localStorage.getItem("itemList")
+      );
+      this.itItem = this.itemList.filter((item) => {
       return item.id == this.id;
     });
+    window.scrollTo( 0, 0 );
   },
 };
 </script>

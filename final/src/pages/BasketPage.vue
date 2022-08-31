@@ -10,24 +10,28 @@
         <p>Итого: {{ basketSum() }}$</p>
         <form v-show="buyForm" lass="basket__form" action="">
           <input
+            v-bind:class="{ alertName: this.clientName }"
             v-model="client.name"
             class="basket__input"
             type="text"
             placeholder="Ваше имя"
           />
           <input
+            v-bind:class="{ alertNumber: this.clientNumber }"
             v-model="client.number"
             class="basket__input"
-            type="text"
+            type="number"
             placeholder="Номер телефона"
           />
           <input
+            v-bind:class="{ alertAdress: this.clientAdress }"
             v-model="client.adress"
             class="basket__input"
             type="text"
             placeholder="Адрес"
           />
           <input
+            v-bind:class="{ alertCity: this.clientCity }"
             v-model="client.city"
             class="basket__input"
             type="text"
@@ -73,6 +77,10 @@ export default {
         city: "",
       },
       buyForm: false,
+      clientName: false,
+      clientNumber: false,
+      clientAdress: false,
+      clientCity: false,
     };
   },
   components: {
@@ -85,8 +93,8 @@ export default {
   methods: {
     uniqueItem() {
       let ids = [];
-      
-      return this.listBasket.filter(item => {
+
+      return this.listBasket.filter((item) => {
         const isIdExist = ids.indexOf(item.id) === -1;
         if (ids.indexOf(item.id) === -1) ids.push(item.id);
         return isIdExist;
@@ -94,6 +102,7 @@ export default {
     },
     async createBuy() {
       if (
+        this.listBasket.length != 0 &&
         this.client.name != "" &&
         this.client.number != "" &&
         this.client.adress != "" &&
@@ -115,22 +124,41 @@ export default {
           .catch(function (error) {
             console.log(error);
           });
-          console.log(this.$store);
+        console.log(this.$store);
         this.$router.push("../productNumber");
       } else {
-        alert("Вы ввели не все данные!");
+        if (this.client.name.length == 0) {
+          this.clientName = true;
+        } else {
+          this.clientName = false;
+        }
+        if (this.client.number.length == 0) {
+          this.clientNumber = true;
+        } else {
+          this.clientNumber = false;
+        }
+        if (this.client.adress.length == 0) {
+          this.clientAdress = true;
+        } else {
+          this.clientAdress = false;
+        }
+        if (this.client.city.length == 0) {
+          this.clientCity = true;
+        } else {
+          this.clientCity = false;
+        }
       }
     },
     basketSum() {
-      if (this.listBasket.length != 0){
-      let basketSum = [];
-      this.listBasket.forEach((item) => basketSum.push(item.price));
-      const total = basketSum.reduce(
-        (accumulator, currentValue) => accumulator + currentValue
-      );
-      return total;
-      }else{
-        return 0
+      if (this.listBasket.length != 0) {
+        let basketSum = [];
+        this.listBasket.forEach((item) => basketSum.push(item.price));
+        const total = basketSum.reduce(
+          (accumulator, currentValue) => accumulator + currentValue
+        );
+        return Math.ceil(total * 100) / 100;
+      } else {
+        return 0;
       }
     },
   },
@@ -139,12 +167,23 @@ export default {
       this.$store.state.listBasket = JSON.parse(
         localStorage.getItem("listBasket")
       );
-      window.scrollTo( 0, 0 );
+    if (JSON.parse(localStorage.getItem("itemList") != null))
+      this.$store.state.itemList = JSON.parse(localStorage.getItem("itemList"));
   },
 };
 </script>
 
 <style lang="scss" scoped>
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+.alertName,
+.alertNumber,
+.alertAdress,
+.alertCity {
+  box-shadow: 0 0 2px 1px red;
+}
 .basket {
   &__buyForm {
     position: fixed;

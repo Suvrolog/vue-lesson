@@ -51,15 +51,13 @@
 </template>
 
 <script>
-// import AppItem from "../components/AppItem.vue";
 import AppItems from "../components/AppItems.vue";
-import { mapState } from "vuex";
+import { mapState,mapActions } from "vuex";
 import AppTopItem from "../components/AppTopItem.vue";
 
 export default {
   components: {
     "app-items": AppItems,
-    // "app-item": AppItem,
     "app-top-item": AppTopItem,
   },
   data() {
@@ -73,11 +71,13 @@ export default {
   },
   computed: {
     ...mapState(["itemList"]),
+    ...mapActions("loadItem"),
     pagesCount() {
       return Math.ceil(this.paginationItemTotal / this.paginationItemsPage);
     },
   },
   methods: {
+    
     filteredItems() {
       if (this.filter == `all`) return this.$store.getters.itemAll;
       if (this.filter == `men`) return this.$store.getters.itemMen;
@@ -86,8 +86,21 @@ export default {
         return this.$store.getters.itemElectronics;
       if (this.filter == `women`) return this.$store.getters.itemWomen;
     },
+    
   },
-  
+   created() {
+      if (JSON.parse(localStorage.getItem("listBasket") != null))
+      this.$store.state.listBasket = JSON.parse(
+        localStorage.getItem("listBasket")
+      );
+    if (JSON.parse(localStorage.getItem("itemList") != null))
+      this.$store.state.itemList = JSON.parse(
+        localStorage.getItem("itemList")
+      );
+  },
+  // unmounted(){
+  //   localStorage.setItem("itemList", JSON.stringify(this.$store.state.itemList))
+  // }
 };
 </script>
 

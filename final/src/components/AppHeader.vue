@@ -5,8 +5,7 @@
         <router-link
           :to="{
             path: `/home`,
-          }"
-          custom
+          }" class="header__item"
           v-slot="{ navigate, isActive, isExactActive }"
         >
           <li
@@ -24,11 +23,10 @@
             /><span class="header__main"> VUE-SPA-SHOP </span>
           </li>
         </router-link>
-        <router-link
+        <router-link class="header__item"
           :to="{
             path: `/category`,
           }"
-          custom
           v-slot="{ navigate, isActive, isExactActive }"
         >
           <li
@@ -37,17 +35,16 @@
               isExactActive && 'router-link-exact-active',
             ]"
             @click="navigate"
-            class="header__item"
+            
           >
             Категории
           </li>
         </router-link>
 
-        <router-link
+        <router-link class="header__item"
           :to="{
             path: `/news`,
           }"
-          custom
           v-slot="{ navigate, isActive, isExactActive }"
         >
           <li
@@ -56,16 +53,15 @@
               isExactActive && 'router-link-exact-active',
             ]"
             @click="navigate"
-            class="header__item"
+            
           >
             Новости
           </li>
         </router-link>
-        <router-link
+        <router-link class="header__item"
           :to="{
             path: `/about`,
           }"
-          custom
           v-slot="{ navigate, isActive, isExactActive }"
         >
           <li
@@ -74,19 +70,18 @@
               isExactActive && 'router-link-exact-active',
             ]"
             @click="navigate"
-            class="header__item"
+            
           >
             О нас
           </li>
         </router-link>
       </ul>
     </nav>
-    <div>+7(499)999 99 99</div>
+    <div><a class="header__item" href="tel:+7499999999"> +7(499)999 99 99 </a></div>
     <router-link
       :to="{
         path: `/basket`,
       }"
-      custom
       v-slot="{ navigate, isActive, isExactActive }"
     >
       <div
@@ -140,6 +135,8 @@ export default {
   &__item {
     list-style-type: none;
     cursor: pointer;
+    text-decoration: none;
+    color: black;
   }
   &__basket {
     margin-left: -60px;

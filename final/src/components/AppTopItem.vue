@@ -70,19 +70,19 @@ export default {
   methods: {
     ...mapMutations(["buyItem"]),
     sumPrice(item) {
-      if (this.listBasket.length == 0) {
-        return item.price;
-      } else {
-        let needItem = this.listBasket.filter(
-          (product) => product.id == item.id
-        );
-        if (needItem.length > 1) {
-          return item.price * needItem.length;
-        } else {
-          return item.price;
-        }
-      }
-    },
+            if (this.listBasket.length == 0) {
+              return item.price;
+            } else {
+              let needItem = this.listBasket.filter(
+                (product) => product.id == item.id
+              );
+              if (needItem.length > 1) {
+                return (Math.ceil(((item.price * needItem.length)*100))/100);
+              } else {
+                return item.price;
+              }
+            }
+          },
   },
 };
 </script>

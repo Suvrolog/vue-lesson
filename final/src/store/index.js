@@ -28,8 +28,10 @@ const store = createStore({
         },
     },
     mutations: {
+        
         getItem(state, payload) {
             state.itemList = payload;
+            localStorage.setItem("itemList", JSON.stringify(state.itemList))
         },
         buyItem(state, product) {
             state.listBasket.push(product);

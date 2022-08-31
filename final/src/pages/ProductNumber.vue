@@ -20,11 +20,10 @@ export default {
       .get("http://localhost:3000/listBasket")
       .then((response) => this.productId = response.data[response.data.length - 1].id)
       .catch((error) => console.log(error));
-
-    console.log(`pidr`)
     localStorage.removeItem("listBasket")
-    this.$store.state.listBasket = "";
-    console.log(this.$store.state);
   },
+  unmounted(){
+    location.reload()
+  }
 };
 </script>
