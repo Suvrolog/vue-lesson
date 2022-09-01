@@ -42,18 +42,19 @@
       />
       <label for="electronics">Электроника</label>
     </form>
-    
+
     <app-items class="mt-6" v-bind:products="filteredItems()" />
 
     <h6>Топ продаж</h6>
-    <app-top-item :itemsToShow="4" v-bind:itemList="itemLst" />
+    <app-top-item :itemsToShow="4" v-bind:itemList="itemList" />
   </section>
 </template>
 
 <script>
 import AppItems from "../components/AppItems.vue";
-import { mapState,mapGetters,mapActions } from "vuex";
+import {  mapGetters } from "vuex";
 import AppTopItem from "../components/AppTopItem.vue";
+import axios from "axios";
 
 export default {
   components: {
@@ -68,38 +69,52 @@ export default {
       paginationOffset: 0,
       filteredArr: "",
       listBasket: this.$store.state.listBasket,
-      itemLst:'',
+      itemList: "",
     };
   },
   computed: {
-    ...mapState(["itemList"]),
-    ...mapActions("loadItem"),
+  //  ...mapState(["itemList"]),
+  
     pagesCount() {
       return Math.ceil(this.paginationItemTotal / this.paginationItemsPage);
     },
-    ...mapGetters(["itemAll", "itemMen", "itemJewelery","itemElectronics","iitemWomen"]),
+    ...mapGetters([
+      "itemAll",
+      "itemMen",
+      "itemJewelery",
+      "itemElectronics",
+      "iitemWomen",
+    ]),
   },
   methods: {
-
     filteredItems() {
-      if (this.filter == `all`) return this.$store.getters.itemAll;
-      if (this.filter == `men`) return this.$store.getters.itemMen;
-      if (this.filter == `jewelery`) return this.$store.getters.itemJewelery;
+      if (this.filter == `all`) return this.itemList;
+      if (this.filter == `men`)
+        return this.itemList.filter(
+          (item) => item.category == "men's clothing"
+        );
+      if (this.filter == `jewelery`)
+        return this.itemList.filter((item) => item.category == "jewelery");
       if (this.filter == `electronics`)
-        return this.$store.getters.itemElectronics;
-      if (this.filter == `women`) return this.$store.getters.itemWomen;
+        return this.itemList.filter((item) => item.category == "electronics");
+      if (this.filter == `women`)
+        return this.itemList.filter(
+          (item) => item.category == "women's clothing"
+        );
     },
-    
   },
-   created() {
-    this.loadItem
-    console.log("load")
-    if (JSON.parse(localStorage.getItem("itemList") != null)){
-      this.itemLst = JSON.parse(
-        localStorage.getItem("itemList")
-      );}else{
-      this.itemLst = this.$store.state.itemList
-      }
+  created() {
+    console.log("load");
+    if (JSON.parse(localStorage.getItem("itemList") != null)) {
+      this.itemList = JSON.parse(localStorage.getItem("itemList"));
+    } else {
+      axios
+        .get("https://fakestoreapi.com/products")
+        .then((response) => {
+          this.itemList = response.data;
+        })
+        .catch((error) => console.log(error));
+    }
   },
 };
 </script>

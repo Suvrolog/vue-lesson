@@ -64,21 +64,6 @@ const store = createStore({
         getCount(state) {
             return state.listBasket.length;
         },
-        itemMen(state) {
-            return state.itemList.filter((item) => item.category == "men's clothing");
-        },
-        itemJewelery(state) {
-            return state.itemList.filter((item) => item.category == "jewelery");
-        },
-        itemElectronics(state) {
-            return state.itemList.filter((item) => item.category == "electronics");
-        },
-        itemWomen(state) {
-            return state.itemList.filter((item) => item.category == "women's clothing");
-        },
-        itemAll(state) {
-            return state.itemList;
-        },
     },
     
 
