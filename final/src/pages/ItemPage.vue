@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapMutations } from "vuex";
 import AppCarousel from ".././components/AppCarousel.vue";
 import AppCounterItem from "../components/AppCounterItem.vue";
 import AppTopItem from "../components/AppTopItem.vue";
@@ -84,6 +84,8 @@ export default {
       descr: false,
       rating: false,
       id: this.$router.currentRoute.value.params.id,
+      listBasket: this.$store.state.listBasket,
+      itemList: this.$store.state.itemList,
     };
   },
   components: {
@@ -91,25 +93,22 @@ export default {
     "app-counter-item": AppCounterItem,
     "app-top-item": AppTopItem,
   },
-  computed: {
-    ...mapState(["itemList","listBasket"]),
-  },
-  methods:{
+  methods: {
     ...mapMutations(["getItem"]),
-       sumPrice(item) {
-            if (this.listBasket.length == 0) {
-              return item.price;
-            } else {
-              let needItem = this.listBasket.filter(
-                (product) => product.id == item.id
-              );
-              if (needItem.length > 1) {
-                return (Math.ceil(((item.price * needItem.length)*100))/100);
-              } else {
-                return item.price;
-              }
-            }
-          },
+    sumPrice(item) {
+      if (this.listBasket.length == 0) {
+        return item.price;
+      } else {
+        let needItem = this.listBasket.filter(
+          (product) => product.id == item.id
+        );
+        if (needItem.length > 1) {
+          return Math.ceil(item.price * needItem.length * 100) / 100;
+        } else {
+          return item.price;
+        }
+      }
+    },
   },
   watch: {
     $route(toR) {
@@ -119,19 +118,17 @@ export default {
       });
     },
   },
-    created() {
+  created() {
+
     if (JSON.parse(localStorage.getItem("listBasket") != null))
-      this.$store.state.listBasket = JSON.parse(
-        localStorage.getItem("listBasket")
-      );
-      if (JSON.parse(localStorage.getItem("itemList") != null))
-      this.$store.state.itemList = JSON.parse(
-        localStorage.getItem("itemList")
-      );
-      this.itItem = this.itemList.filter((item) => {
+      this.listBasket = JSON.parse(localStorage.getItem("listBasket"));
+    if (JSON.parse(localStorage.getItem("itemList") != null))
+      this.itemList = JSON.parse(localStorage.getItem("itemList"));
+
+    this.itItem = this.itemList.filter((item) => {
       return item.id == this.id;
     });
-    window.scrollTo( 0, 0 );
+    window.scrollTo(0, 0);
   },
 };
 </script>

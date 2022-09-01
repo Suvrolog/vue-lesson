@@ -1,6 +1,35 @@
 <template>
   <div>
-    <app-carousel v-bind:itemList="itemList"/>
+    <!-- <app-carousel v-bind:itemList="itemList"/> -->
+
+    <v-carousel 
+      hide-delimiters 
+      cycle
+    >
+      <v-carousel-item
+        v-for="item in this.itemList"
+        :key="item.id"
+        transition="fade-transition"
+        reverse-transition="fade-transition"
+      >
+        <router-link
+          :to="{
+            path: `/products/${item.id}`,
+          }"
+          custom
+          v-slot="{ navigate, isActive, isExactActive }"
+        >
+      <v-img
+            :aspect-ratio="16 / 9"
+            height="100%" :class="[
+              isActive && 'router-link-active',
+              isExactActive && 'router-link-exact-active',
+            ]"
+            @click="navigate" :src="item.image" :alt="item.title"></v-img>
+      </router-link>
+      </v-carousel-item>
+    </v-carousel>
+
     <div>
       <h3 class="head-name">Товары</h3>
       <app-item v-bind:itemList="itemList"/>
@@ -14,13 +43,13 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from "vuex";
-import AppCarousel from ".././components/AppCarousel.vue";
+
 import AppItem from ".././components/AppItem.vue";
 import AppTopItem from "../components/AppTopItem.vue";
 
 export default {
   components: {
-    "app-carousel": AppCarousel,
+
     "app-item": AppItem,
     "app-top-item": AppTopItem,
   },
@@ -34,7 +63,6 @@ export default {
     ...mapActions(["loadItem"]),
   },
    mounted() {
-    
       this.$store.dispatch("loadItem");
      window.scrollTo( 0, 0 );
     },

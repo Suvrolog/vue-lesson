@@ -1,9 +1,11 @@
 <template>
-<div >
-  <app-header :listBasket="listBasket.length"/>
-  <router-view class="margin"/>
-  <app-footer/>
-  </div>
+  <v-app>
+    <v-main>
+      <app-header :listBasket="listBasket.length" />
+      <router-view class="margin" />
+      <app-footer />
+    </v-main>
+  </v-app>
 </template>
 
 <script>
@@ -25,19 +27,17 @@ export default {
     // calcListBasketLength() {
     //   return this.listBasket.length === 0 ? 0 : this.listBasket.length;
     // }
-  }
-  
+  },
 };
 </script>
 
 <style lang="scss">
-#app{
+#app {
   max-width: 95%;
   margin-left: auto;
   margin-right: auto;
 }
-.margin{
+.margin {
   padding-top: 80px;
 }
-
 </style>

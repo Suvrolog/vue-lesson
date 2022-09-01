@@ -14,11 +14,10 @@ const store = createStore({
             image: '',
             showProductsPosition: 0,
         }
-
     },
     actions: {
-        loadItem({ commit, state }) {
-            if (JSON.parse(localStorage.getItem("listBasket") != null)) state.listBasket = JSON.parse(localStorage.getItem("listBasket"))
+        loadItem({ commit }) {
+
             axios
                 .get("https://fakestoreapi.com/products")
                 .then((response) => {
@@ -26,10 +25,16 @@ const store = createStore({
                 })
                 .catch((error) => console.log(error));
         },
+
     },
     mutations: {
-        
+
+        loadPages(state) {
+            if (JSON.parse(localStorage.getItem("listBasket") != null)) state.listBasket = JSON.parse(localStorage.getItem("listBasket"))
+            if (JSON.parse(localStorage.getItem("itemList") != null)) state.itemList = JSON.parse(localStorage.getItem("itemList"))
+        },
         getItem(state, payload) {
+            if (JSON.parse(localStorage.getItem("listBasket") != null)) state.listBasket = JSON.parse(localStorage.getItem("listBasket"))
             state.itemList = payload;
             localStorage.setItem("itemList", JSON.stringify(state.itemList))
         },
@@ -40,7 +45,6 @@ const store = createStore({
         },
         delItem(state, product) {
             let flag = true;
-            //localStorage.removeItem("listBasket", JSON.stringify(state.listBasket));
             state.listBasket = state.listBasket.filter(item => {
                 if (flag && item.id === product.id) {
 
@@ -51,26 +55,15 @@ const store = createStore({
             });
             localStorage.removeItem("listBasket");
             localStorage.setItem("listBasket", JSON.stringify(state.listBasket))
-            // let del = JSON.stringify(product)
-
-
-
-            // console.log(del)
-            // localStorage.removeItem(del);
-
-            // var listBasket = JSON.parse(localStorage.listBasket);
-            // for (var i = 0; i < listBasket.length; i++) {
-            //     if (listBasket[i].storeNumber === del) {
-            //         listBasket.splice(i, 1);
-            //     }
-            // }
-            // localStorage.listBasket = JSON.stringify(listBasket);
         },
 
 
 
     },
     getters: {
+        getCount(state) {
+            return state.listBasket.length;
+        },
         itemMen(state) {
             return state.itemList.filter((item) => item.category == "men's clothing");
         },
@@ -86,7 +79,8 @@ const store = createStore({
         itemAll(state) {
             return state.itemList;
         },
-    }
+    },
+    
 
 })
 

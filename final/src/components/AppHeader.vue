@@ -1,109 +1,138 @@
 <template>
-  <section class="header">
-    <nav>
-      <ul class="header__nav">
-        <router-link
-          :to="{
-            path: `/home`,
-          }" class="header__item"
-          v-slot="{ navigate, isActive, isExactActive }"
-        >
-          <li
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active',
-            ]"
-            @click="navigate"
-            class="header__item"
-          >
-            <img
-              class="header__logo"
-              alt="Vue logo"
-              src=".././assets/logo.png"
-            /><span class="header__main"> VUE-SPA-SHOP </span>
-          </li>
-        </router-link>
-        <router-link class="header__item"
-          :to="{
-            path: `/category`,
-          }"
-          v-slot="{ navigate, isActive, isExactActive }"
-        >
-          <li
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active',
-            ]"
-            @click="navigate"
-            
-          >
-            Категории
-          </li>
-        </router-link>
-
-        <router-link class="header__item"
-          :to="{
-            path: `/news`,
-          }"
-          v-slot="{ navigate, isActive, isExactActive }"
-        >
-          <li
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active',
-            ]"
-            @click="navigate"
-            
-          >
-            Новости
-          </li>
-        </router-link>
-        <router-link class="header__item"
-          :to="{
-            path: `/about`,
-          }"
-          v-slot="{ navigate, isActive, isExactActive }"
-        >
-          <li
-            :class="[
-              isActive && 'router-link-active',
-              isExactActive && 'router-link-exact-active',
-            ]"
-            @click="navigate"
-            
-          >
-            О нас
-          </li>
-        </router-link>
-      </ul>
-    </nav>
-    <div><a class="header__item" href="tel:+7499999999"> +7(499)999 99 99 </a></div>
+  <v-app-bar class="header justify-space-between">
     <router-link
+      class="header__item ml-7"
       :to="{
-        path: `/basket`,
+        path: `/home`,
       }"
       v-slot="{ navigate, isActive, isExactActive }"
     >
-      <div
+      <v-app-bar-title
         :class="[
           isActive && 'router-link-active',
           isExactActive && 'router-link-exact-active',
         ]"
         @click="navigate"
       >
-        <img class="header__basket" src=".././assets/basket.png" alt="basket" />
-        <div class="header__counter">{{ listBasket }}</div>
-      </div>
+        <img
+          class="header__logo"
+          alt="Vue logo"
+          src="https://raw.githubusercontent.com/Suvrolog/vue-lesson/57fdde69200cf77339c0bafa78067e978c18efea/logo.svg"
+        /><span> VUE-SPA-SHOP </span>
+      </v-app-bar-title>
     </router-link>
-  </section>
+    <router-link
+      class="header__item ml-7"
+      :to="{
+        path: `/category`,
+      }"
+      v-slot="{ navigate, isActive, isExactActive }"
+    >
+      <v-app-bar-title
+        :class="[
+          isActive && 'router-link-active',
+          isExactActive && 'router-link-exact-active',
+        ]"
+        @click="navigate"
+      >
+        Категории
+      </v-app-bar-title>
+    </router-link>
+
+    <router-link
+      class="header__item ml-7"
+      :to="{
+        path: `/news`,
+      }"
+      v-slot="{ navigate, isActive, isExactActive }"
+    >
+      <v-app-bar-title
+        :class="[
+          isActive && 'router-link-active',
+          isExactActive && 'router-link-exact-active',
+        ]"
+        @click="navigate"
+      >
+        Новости
+      </v-app-bar-title>
+    </router-link>
+    <router-link
+      class="header__item ml-7"
+      :to="{
+        path: `/about`,
+      }"
+      v-slot="{ navigate, isActive, isExactActive }"
+    >
+      <v-app-bar-title
+        :class="[
+          isActive && 'router-link-active',
+          isExactActive && 'router-link-exact-active',
+        ]"
+        @click="navigate"
+      >
+        О нас
+      </v-app-bar-title>
+    </router-link>
+
+    <v-app-bar-title
+      ><a class="header__item ml-10" href="tel:+7499999999">
+        +7(499)999 99 99
+      </a></v-app-bar-title
+    >
+    <router-link
+      :to="{
+        path: `/basket`,
+      }"
+      v-slot="{ navigate, isActive, isExactActive }"
+    >
+      <v-app-bar-title
+        :class="[
+          isActive && 'router-link-active',
+          isExactActive && 'router-link-exact-active',
+        ]"
+        @click="navigate"
+      >
+        <img
+          class="header__basket"
+          src="https://raw.githubusercontent.com/Suvrolog/vue-lesson/57fdde69200cf77339c0bafa78067e978c18efea/basket.svg"
+          alt="basket"
+        />
+        <div class="header__counter">{{ reloadGetCount() }}</div>
+      </v-app-bar-title>
+    </router-link>
+  </v-app-bar>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   name: "app-header",
   props: {
     msg: String,
     listBasket: Number,
+  },
+  data() {
+    return {
+      reloadCheck: [],
+    };
+  },
+  computed: {
+    ...mapGetters(["getCount"]),
+  },
+  methods: {
+    reloadGetCount() {
+      if (this.getCount != 0) {
+        return this.getCount;
+      } else {
+        if (JSON.parse(localStorage.getItem("listBasket") != null)) {
+          this.reloadCheck = JSON.parse(localStorage.getItem("listBasket"));
+          return this.reloadCheck.length;
+        } else {
+          return 0;
+        }
+      }
+    },
   },
 };
 </script>
@@ -111,21 +140,9 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .header {
-  justify-content: space-between;
-  width: 95%;
-  display: flex;
   background-color: #c9def1;
   align-items: center;
-  position: fixed;
-  z-index: 1000;
-  margin-bottom: 100px;
-  &__nav {
-    justify-content: space-between;
-    display: flex;
-    min-width: 800px;
-    align-items: center;
-    margin-top: 10px;
-  }
+
   &__main {
     padding-top: -25px;
   }
@@ -139,15 +156,17 @@ export default {
     color: black;
   }
   &__basket {
-    margin-left: -60px;
     cursor: pointer;
+
+    margin-right: 40px;
   }
   &__counter {
     position: absolute;
-    margin-top: -42px;
-    margin-left: -30px;
+    margin-top: -45px;
+    margin-left: 30px;
     color: white;
     font-size: 15px;
+    z-index: 1000;
     &::before {
       content: "";
       display: inline-block;
@@ -159,9 +178,12 @@ export default {
       border-radius: 15px;
       background-color: red;
       right: -8px;
-      margin-top: -1px;
+      margin-top: 3px;
       z-index: -1;
     }
+  }
+  .router-link-active {
+    color: rgb(13, 110, 253);
   }
 }
 </style>

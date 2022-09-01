@@ -1,6 +1,6 @@
 <template>
   <section class="category">
-    <form class="category__filter">
+    <form>
       <input
         name="filter"
         type="radio"
@@ -43,16 +43,16 @@
       <label for="electronics">Электроника</label>
     </form>
     
-    <app-items v-bind:products="filteredItems()" />
+    <app-items class="mt-6" v-bind:products="filteredItems()" />
 
     <h6>Топ продаж</h6>
-    <app-top-item :itemsToShow="4" v-bind:itemList="itemList" />
+    <app-top-item :itemsToShow="4" v-bind:itemList="itemLst" />
   </section>
 </template>
 
 <script>
 import AppItems from "../components/AppItems.vue";
-import { mapState,mapActions } from "vuex";
+import { mapState,mapGetters,mapActions } from "vuex";
 import AppTopItem from "../components/AppTopItem.vue";
 
 export default {
@@ -67,6 +67,8 @@ export default {
       paginationItemsPage: 8,
       paginationOffset: 0,
       filteredArr: "",
+      listBasket: this.$store.state.listBasket,
+      itemLst:'',
     };
   },
   computed: {
@@ -75,9 +77,10 @@ export default {
     pagesCount() {
       return Math.ceil(this.paginationItemTotal / this.paginationItemsPage);
     },
+    ...mapGetters(["itemAll", "itemMen", "itemJewelery","itemElectronics","iitemWomen"]),
   },
   methods: {
-    
+
     filteredItems() {
       if (this.filter == `all`) return this.$store.getters.itemAll;
       if (this.filter == `men`) return this.$store.getters.itemMen;
@@ -89,18 +92,15 @@ export default {
     
   },
    created() {
-      if (JSON.parse(localStorage.getItem("listBasket") != null))
-      this.$store.state.listBasket = JSON.parse(
-        localStorage.getItem("listBasket")
-      );
-    if (JSON.parse(localStorage.getItem("itemList") != null))
-      this.$store.state.itemList = JSON.parse(
+    this.loadItem
+    console.log("load")
+    if (JSON.parse(localStorage.getItem("itemList") != null)){
+      this.itemLst = JSON.parse(
         localStorage.getItem("itemList")
-      );
+      );}else{
+      this.itemLst = this.$store.state.itemList
+      }
   },
-  // unmounted(){
-  //   localStorage.setItem("itemList", JSON.stringify(this.$store.state.itemList))
-  // }
 };
 </script>
 

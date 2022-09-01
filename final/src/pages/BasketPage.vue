@@ -64,7 +64,6 @@
 <script>
 import axios from "axios";
 import AppItem from ".././components/AppItem.vue";
-import { mapState } from "vuex";
 import AppTopItem from "../components/AppTopItem.vue";
 
 export default {
@@ -81,19 +80,18 @@ export default {
       clientNumber: false,
       clientAdress: false,
       clientCity: false,
+      listBasket: this.$store.state.listBasket,
+      itemList: this.$store.state.itemList,
     };
   },
   components: {
     "app-item": AppItem,
     "app-top-item": AppTopItem,
   },
-  computed: {
-    ...mapState(["itemList", "listBasket"]),
-  },
+
   methods: {
     uniqueItem() {
       let ids = [];
-
       return this.listBasket.filter((item) => {
         const isIdExist = ids.indexOf(item.id) === -1;
         if (ids.indexOf(item.id) === -1) ids.push(item.id);
@@ -124,7 +122,6 @@ export default {
           .catch(function (error) {
             console.log(error);
           });
-        console.log(this.$store);
         this.$router.push("../productNumber");
       } else {
         if (this.client.name.length == 0) {
@@ -164,11 +161,9 @@ export default {
   },
   created() {
     if (JSON.parse(localStorage.getItem("listBasket") != null))
-      this.$store.state.listBasket = JSON.parse(
-        localStorage.getItem("listBasket")
-      );
+      this.listBasket = JSON.parse(localStorage.getItem("listBasket"));
     if (JSON.parse(localStorage.getItem("itemList") != null))
-      this.$store.state.itemList = JSON.parse(localStorage.getItem("itemList"));
+      this.itemList = JSON.parse(localStorage.getItem("itemList"));
   },
 };
 </script>
@@ -192,6 +187,7 @@ input[type="number"]::-webkit-inner-spin-button {
   }
   &__main {
     display: flex;
+    margin-bottom: 50px;
   }
   &__item {
     width: 75%;

@@ -9,14 +9,16 @@
     "myserv": "json-server --watch db.json"
   },
   "dependencies": {
+    "@mdi/font": "5.9.55",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
+    "roboto-fontface": "*",
     "vue": "^3.2.13",
-    "vue-awesome-paginate": "^1.0.23",
     "vue-router": "^4.1.4",
     "vue3-carousel": "^0.1.46",
-    "vuejs-paginate-next": "^1.0.2",
-    "vuex": "^4.0.2"
+    "vuetify": "^3.0.0-beta.0",
+    "vuex": "^4.0.2",
+    "webfontloader": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -27,7 +29,9 @@
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "node-sass": "^7.0.1",
-    "sass-loader": "^13.0.2"
+    "sass-loader": "^13.0.2",
+    "vue-cli-plugin-vuetify": "~2.5.5",
+    "webpack-plugin-vuetify": "^2.0.0-alpha.0"
   },
   "eslintConfig": {
     "root": true,
